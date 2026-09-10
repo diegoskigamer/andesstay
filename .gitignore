@@ -1,0 +1,22 @@
+# Backend (Maven/Java)
+backend/target/
+backend/.mvn/
+*.class
+
+# Frontend (Node/Vite)
+frontend/node_modules/
+frontend/dist/
+
+# Variables de entorno (contienen credenciales, nunca se suben)
+.env
+frontend/.env
+backend/.env
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db
