@@ -33,7 +33,7 @@ export default function NavBar() {
 
       <div className="navbar-session">
         {authMode === "simulated" ? (
-          <div title="Sesión simulada (login real pendiente de activar)">
+          <div className="msal-session">
             <input
               className="session-name-input"
               value={name}
@@ -44,6 +44,7 @@ export default function NavBar() {
                 <option key={r} value={r}>{r}</option>
               ))}
             </select>
+            <button className="btn-secondary small" onClick={logout}>Cerrar sesión</button>
           </div>
         ) : (
           <div className="msal-session">

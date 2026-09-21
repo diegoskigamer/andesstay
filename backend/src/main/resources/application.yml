@@ -27,15 +27,13 @@ spring:
   jackson:
     default-property-inclusion: non_null
 
-# --- Security placeholder -----------------------------------------------
-# Cuando se active Azure AD, esto se completa con:
-# security:
-#   oauth2:
-#     resourceserver:
-#       jwt:
-#         issuer-uri: https://login.microsoftonline.com/<TENANT_ID>/v2.0
-#         audiences: api://<API_CLIENT_ID>
-# Por ahora la seguridad está DESHABILITADA (ver config/SecurityConfig.java)
 andesstay:
   security:
     enabled: false
+
+cognito:
+  region: ${COGNITO_REGION:}
+  user-pool-id: ${COGNITO_USER_POOL_ID:}
+  client-id: ${COGNITO_CLIENT_ID:}
+  client-secret: ${COGNITO_CLIENT_SECRET:}
+  domain: ${COGNITO_DOMAIN:}

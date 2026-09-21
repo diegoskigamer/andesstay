@@ -5,11 +5,12 @@ export { ROLES } from "./SessionContext";
 export { useSession } from "./SessionContext";
 
 // -----------------------------------------------------------------------
-// MODO SIMULADO (sin login real) — se usa cuando VITE_AUTH_MODE !== "msal"
-// o cuando faltan las variables de Azure AD en .env.
+// MODO SIMULADO (sin Cognito/Azure AD real) — se usa cuando
+// VITE_AUTH_MODE !== "cognito" o cuando falta configurar Cognito en .env.
 //
-// Deja un selector de rol para poder probar los 4 perfiles del caso sin
-// depender de un tenant de Azure AD real.
+// Tiene su propia pantalla de login (SimulatedLogin.jsx) y un botón de
+// "Cerrar sesión" — el mismo comportamiento que el login real, sin
+// depender de AWS/Azure.
 // -----------------------------------------------------------------------
 
 const STORAGE_KEY = "andesstay.simulatedSession";
@@ -22,27 +23,28 @@ export function RoleProvider({ children }) {
     } catch {
       // ignore
     }
-    return { role: ROLES.ADMIN, name: "Ana Admin" };
+    return { role: ROLES.ADMIN, name: "Ana Admin", isAuthenticated: false };
   });
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   }, [session]);
 
-  const setRole = (role, name) => setSession({ role, name: name ?? session.name });
+  const setRole = (role, name) => setSession((s) => ({ ...s, role, name: name ?? s.name }));
   const setName = (name) => setSession((s) => ({ ...s, name }));
+
+  const login = (name, role) =>
+    setSession((s) => ({ ...s, name: name || s.name, role: role || s.role, isAuthenticated: true }));
+
+  const logout = () => setSession((s) => ({ ...s, isAuthenticated: false }));
 
   const value = {
     ...session,
-    isAuthenticated: true, // en modo simulado "siempre hay sesión"
     authMode: "simulated",
     setRole,
     setName,
-    login: () => {},
-    logout: () => {
-      localStorage.removeItem(STORAGE_KEY);
-      setSession({ role: ROLES.ADMIN, name: "Ana Admin" });
-    },
+    login,
+    logout,
   };
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

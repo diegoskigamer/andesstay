@@ -1,12 +1,14 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { RoleProvider } from "./context/RoleContext";
-import { MsalSessionProvider } from "./auth/MsalSessionProvider";
-import { AUTH_MODE, isMsalConfigured } from "./auth/msalConfig";
+import { CognitoSessionProvider } from "./auth/CognitoSessionProvider";
+import { AUTH_MODE, isCognitoConfigured } from "./auth/cognitoConfig";
 import { ROLES } from "./context/SessionContext";
 import NavBar from "./components/NavBar";
 import RoleGate from "./components/RoleGate";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
+import SimulatedLogin from "./pages/SimulatedLogin";
+import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import Reservations from "./pages/Reservations";
 import Catalog from "./pages/Catalog";
@@ -14,25 +16,21 @@ import Reports from "./pages/Reports";
 import Audit from "./pages/Audit";
 
 // -----------------------------------------------------------------------
-// MODO DE AUTENTICACIÓN
-//
-// Se decide con VITE_AUTH_MODE en frontend/.env:
-//   - "simulated" (o vacío): selector de rol manual, sin login real.
-//   - "msal": login real con Azure AD (App Registration "BarrioDigital").
-//     Requiere también VITE_AZURE_CLIENT_ID y VITE_AZURE_TENANT_ID.
-//
-// Si VITE_AUTH_MODE=msal pero faltan esas variables, se cae de vuelta a
-// modo simulado automáticamente para no dejar la app rota.
+// MODO DE AUTENTICACIÓN — VITE_AUTH_MODE en frontend/.env:
+//   - "simulated" (default): pantalla de login simulada, sin Azure/Cognito.
+//   - "cognito": login real, federado con Azure AD a través de Cognito.
 // -----------------------------------------------------------------------
-const useMsal = AUTH_MODE === "msal" && isMsalConfigured;
-const SessionProvider = useMsal ? MsalSessionProvider : RoleProvider;
+const useCognito = AUTH_MODE === "cognito" && isCognitoConfigured;
+const SessionProvider = useCognito ? CognitoSessionProvider : RoleProvider;
+const LoginScreen = useCognito ? Login : SimulatedLogin;
 
 export default function App() {
   return (
     <SessionProvider>
       <BrowserRouter>
         <Routes>
-          {useMsal && <Route path="/login" element={<Login />} />}
+          <Route path="/login" element={<LoginScreen />} />
+          {useCognito && <Route path="/callback" element={<AuthCallback />} />}
           <Route
             path="/*"
             element={

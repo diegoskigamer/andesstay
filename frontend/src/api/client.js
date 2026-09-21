@@ -1,13 +1,12 @@
 // Cliente API centralizado.
 //
-// En modo simulado (VITE_AUTH_MODE != "msal") pega directo al backend sin
-// header de autorización. En modo MSAL real, adjunta automáticamente
-// `Authorization: Bearer <access_token>` obtenido de Azure AD antes de
-// cada request. Cuando se conecte el API Gateway / BFF, solo hay que
-// cambiar BASE_URL para que apunte ahí en vez de directo al backend.
+// En modo simulado (VITE_AUTH_MODE != "cognito") pega directo al backend
+// sin header de autorización. En modo Cognito, adjunta automáticamente
+// `Authorization: Bearer <id_token>` (el id_token de Cognito trae los
+// datos del usuario federado desde Azure AD, incluido el rol).
 
-import { AUTH_MODE } from "../auth/msalConfig";
-import { getAccessToken } from "../auth/getAccessToken";
+import { AUTH_MODE } from "../auth/cognitoConfig";
+import { getStoredTokens } from "../auth/cognitoTokenStorage";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
@@ -17,9 +16,9 @@ async function request(path, options = {}) {
     ...(options.headers || {}),
   };
 
-  if (AUTH_MODE === "msal") {
-    const token = await getAccessToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
+  if (AUTH_MODE === "cognito") {
+    const tokens = getStoredTokens();
+    if (tokens?.idToken) headers.Authorization = `Bearer ${tokens.idToken}`;
   }
 
   const res = await fetch(`${BASE_URL}${path}`, {

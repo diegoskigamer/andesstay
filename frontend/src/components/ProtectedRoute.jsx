@@ -2,14 +2,13 @@ import { Navigate } from "react-router-dom";
 import { useSession } from "../context/SessionContext";
 
 /**
- * En modo simulado, isAuthenticated siempre es true, así que esto no hace
- * nada (no rompe el flujo actual). En modo MSAL real, redirige a /login
- * si no hay sesión activa.
+ * Redirige a /login si no hay sesión activa, tanto en modo simulado
+ * (donde ahora también hay una pantalla de login) como en modo Cognito.
  */
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, authMode } = useSession();
+  const { isAuthenticated } = useSession();
 
-  if (authMode === "msal" && !isAuthenticated) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
