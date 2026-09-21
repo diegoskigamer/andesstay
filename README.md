@@ -1,61 +1,49 @@
-# AndesStay — Caso semestral
+# 🏔️ AndesStay - Sistema de Gestión de Reservas y Alojamientos
 
-Plataforma de reservas para una red de hostales, cabañas y lodges.
-Este repo trae **backend (Spring Boot)** y **frontend (React)**
-funcionando end-to-end para los módulos core del caso, con el login
-(MSAL + Azure AD) y la mensajería (RabbitMQ/Kafka) dejados listos para
-conectar después, sin necesidad de reescribir la lógica de negocio.
+Bienvenido al repositorio oficial de **AndesStay**. Este proyecto consiste en una plataforma web integral diseñada para la gestión de reservas, administración de unidades turísticas/alojamientos, reportes y control de usuarios con autenticación segura.
 
-## Estructura
+---
 
-```
-andesstay/
-├── backend/     Spring Boot (Java 17, Maven) — ver backend/README.md
-└── frontend/    React + Vite               — ver frontend/README.md
-```
+## 🚀 Arquitectura y Tecnologías
 
-## Cómo correr todo en local
+El proyecto está estructurado en una arquitectura cliente-servidor (Frontend + Backend):
 
-Terminal 1:
-```bash
-cd backend
-mvn spring-boot:run
-```
+### Backend (`/backend`)
+* **Lenguaje & Framework:** Java (Spring Boot)
+* **Gestor de dependencias:** Apache Maven (`pom.xml`)
+* **Seguridad y Autenticación:** Integración con AWS Cognito / Spring Security
+* **Módulos Principales:**
+  * **Reservas (`ReservationController`):** Gestión del ciclo de vida y estado de las reservas.
+  * **Catálogo (`CatalogController`):** Administración de unidades y tipos de unidad.
+  * **Reportes (`ReportController`):** Generación de datos estadísticos e informes.
+  * **Auditoría (`AuditController`):** Registro de eventos y trazabilidad.
 
-Terminal 2:
-```bash
-cd frontend
-npm install
-cp .env.example .env
-npm run dev
-```
+### Frontend (`/frontend`)
+* **Framework / Librería:** React con Vite
+* **Herramientas de Build:** Vite & Rollup
+* **Autenticación UI:** Integración con MSAL / Azure AD / Cognito OAuth
+* **Calidad de código:** Oxlint (`.oxlintrc.json`)
 
-Abre `http://localhost:5173`. Usa el selector de rol en la barra superior
-para probar como Admin, Recepcionista, Huésped o Auditor (el login real
-todavía no está implementado, a propósito).
+---
 
-## Qué quedó implementado
+## 📁 Estructura del Proyecto
 
-- Módulo de Reservas con la máquina de estados completa y sus reglas
-  (no check-in sin confirmar, disponibilidad, etc.)
-- Módulo de Catálogo (unidades, tarifas, disponibilidad)
-- Módulo de Auditoría (timeline de eventos, solo lectura)
-- Módulo de Reportería (KPIs: reservas por hora, tiempo de ciclo,
-  ocupación activa, unidades más demandadas)
-- Control de acceso por rol en el frontend (RoleGate), listo para
-  conectarse a los claims reales de Azure AD
-- Puntos de integración explícitos y comentados para: Spring Security +
-  JWT de Azure AD, RabbitMQ (notificaciones), Kafka (auditoría/reportería
-  en streaming)
-
-## Qué falta (siguiente etapa)
-
-- Login real con MSAL + Azure AD (frontend) y validación de JWT con
-  Spring Security (backend)
-- RabbitMQ para notificaciones asíncronas (colas + DLQ)
-- Kafka para streaming de eventos de auditoría y reportería
-- Separar el backend en los microservicios reales del caso
-  (`ms-andesstay-reservations`, `ms-andesstay-catalog`, etc.) detrás de
-  `ms-andesstay-bff` y AWS API Gateway
-- Despliegue en AWS EC2 con Docker / Docker Compose
-- Migrar de H2 a Oracle
+```text
+andesstay-proyecto/
+└── andesstay/
+    ├── backend/
+    │   ├── src/main/java/com/andesstay/
+    │   │   ├── config/          # Seguridad, CORS, Seeder de datos
+    │   │   ├── controller/      # Endpoints REST (Auth, Catalog, Reservations, Reports, Audit)
+    │   │   ├── domain/          # Entidades principales (Unit, Reservation, AuditEvent, etc.)
+    │   │   ├── dto/             # Objetos de transferencia de datos
+    │   │   ├── exception/       # Manejo global de excepciones
+    │   │   ├── repository/     # Repositorios JPA / Persistencia
+    │   │   └── service/        # Lógica de negocio y notificaciones
+    │   ├── src/main/resources/  # Configuraciones (application.yml)
+    │   └── pom.xml
+    └── frontend/
+        ├── src/                 # Componentes, vistas y lógica de la UI
+        ├── index.html
+        ├── vite.config.js
+        └── package.json
